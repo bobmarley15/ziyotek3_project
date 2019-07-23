@@ -1,0 +1,46 @@
+
+== Purpose ==
+Wiki websites are excellent resources for sharing and updating information.  This is particularly relevant for the open-source software community.  The software is easy to install and the graphical user interface is even easier for users to contribute.  
+
+== Installation & Configuration ==
+Since this wiki is hosted on AWS, I will break the installation and configuration into AWS and WikiMedia.
+=== AWS ===
+# Create IAM Users/Permissions
+## Create Group named Ziyotek3
+## Create Users and add to Ziyotek3
+## Attach policies to Ziyotek3
+### AmazonVPCFullAccess
+### AmazonEC2ContainerServicesFullAccess
+# Launch and configure VPC 
+## subnet, internet gateway, route table
+# Launch and configure EC2 Instance 
+## Elastic IP- for wiki users to use one IP Address
+## Create key pair, private key to access command line
+
+=== WikiMedia ===
+==== Installation ====
+# Install epel-release 7 (not in portal)
+#: yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+# Install Apache, MariaDB, PHP
+#''' Install LAMP for Amazon Linux 2'''
+#: amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
+# systemctl start/enable httpd mariadb
+# Install mysql on command line, configure on graphical website
+==== Configuration ====
+# Create New Page
+## <Wiki IP Address>/index.php/<PAGE_NAME> - simply enter desired page name after index.php to create page
+#''' Enable Image Uploads '''
+## yum install -y ImageMagick
+## cd /var/www/html
+##: chown apache:apache images/
+## vi LocalSettings.php
+  $wgEnableUploads = true; #LINE 72
+  $wgUseImageMagick = true;
+  $wgImageMagickConvertCommand = "/usr/bin/convert";
+  $wgAllowCopyUploads = true;  
+  $wgHashedUploadDirectory = true;
+  $wgFileExtensions = array('png','gif','jpg','jpeg','doc','xls','mpp','pdf','ppt','tiff','bmp','docx', 'xlsx', 'pptx','ps','odt','ods','odp','odg');
+
+== Server ==
+
+[http://35.170.226.167/index.php/Ziyotek3 Ziyotek3 Wiki]
