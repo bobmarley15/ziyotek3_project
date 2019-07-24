@@ -1,0 +1,135 @@
+---
+# tasks file for mail
+- name: install postfix
+  yum:
+    name: postfix
+    state: latest
+
+- name: template mail file
+  template:
+    src: main.cf.j2
+    dest: /etc/postfix/main.cf
+
+- name: start firewalld
+  service:
+    name: firewalld
+    state: started
+    enabled: true
+
+- firewalld:
+    service: smtp
+    permanent: yes
+    state: enabled
+
+- firewalld:
+    service: imap
+    permanent: yes
+    state: enabled
+
+- firewalld:
+    service: pop3
+    permanent: yes
+    state: enabled
+
+- firewalld:
+    service: http
+    permanent: yes
+    state: enabled
+
+- name: reload firewalld
+  command: firewall-cmd --reload
+
+- name: start and enable postfix
+  service:
+    name: postfix
+    state: started
+    enabled: true
+
+- name: install telnet
+  yum:
+    name: telnet
+    state: latest
+
+- name: install dovecot
+  yum:
+    name: dovecot
+    state: latest
+
+- name: template mail file
+  template:
+    src: dovecot.conf.j2
+    dest: /etc/dovecot/dovecot.conf
+- name: template mail file
+  template:
+    src: 10-auth.conf.j2
+    dest: /etc/dovecot/conf.d/10-auth.conf
+- name: template mail file
+  template:
+    src: 10-mail.conf.j2
+    dest: /etc/dovecot/conf.d/10-mail.conf
+- name: template mail file
+  template:
+    src: 10-ssl.conf.j2
+    dest: /etc/dovecot/conf.d/10-ssl.conf
+- name: template mail file
+  template:
+    src: 10-master.conf.j2
+    dest: /etc/dovecot/conf.d/10-master.conf
+
+- name: start and enable dovecot
+  service:
+    name: dovecot
+    state: started
+    enabled: true
+
+- name: install epel-release
+  yum:
+    name: epel-release
+    state: latest
+
+- name: install squirrelmail
+  yum:
+    name: squirrelmail
+    state: latest
+
+- name: install httpd
+  yum:
+    name: httpd
+    state: latest
+
+- name: Install Squirrelmail configuration
+  template:
+    src: squirrelmail.conf.j2
+    dest: /usr/share/squirrelmail/config/config.php
+      owner=root
+      group=apache
+      mode=640
+
+- name: Create symlink to squirrelmail
+  file:
+    src: /usr/share/squirrelmail
+    dest: /var/www/squirrelmail
+    state: link
+    force: yes
+
+- name: start and enable httpd
+  service:
+    name: httpd
+    state: started
+    enabled: true
+
+- name: Install httpd configuration
+  template:
+    src: httpd.conf.j2
+    dest: /etc/httpd/conf/httpd.conf
+  notify: restart httpd
+
+- name: Set SELinux in permissive mode until the machine is rebooted
+  command: setenforce 0
+  ignore_errors: true
+  changed_when: false
+
+- name: Disable SELinux at next reboot
+  selinux:
+    state: disabled
+  notify: restart httpd
