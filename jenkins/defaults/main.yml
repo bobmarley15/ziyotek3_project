@@ -1,0 +1,3 @@
+---
+# defaults file for jenkins
+firewall_service: ssh
