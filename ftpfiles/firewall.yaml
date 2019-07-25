@@ -1,0 +1,11 @@
+---
+- hosts: ftpserver
+  become: true
+  tasks:
+   - name: firewall rule
+     shell: firewall-cmd --permanent --add-port=21/tcp
+   - name: firewall rule
+     shell: firewall-cmd --permanent --add-service=ftp
+   - name: reloading firewall
+     shell: firewall-cmd --reload
+

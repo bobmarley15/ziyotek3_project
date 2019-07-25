@@ -1,0 +1,8 @@
+---
+- hosts: httpservers
+  become: true
+  tasks:
+   - name: installing all packages
+     yum: 
+       name: "{{ bind-utils,man,man-pages,mlocate,sysstat }}" 
+       state: present

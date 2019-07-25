@@ -1,0 +1,28 @@
+---
+- hosts: nfsserver
+  become: yes
+  tasks:
+   - name: install nfs
+     yum:  name=nfs* state=latest
+   - name: starting nfs service
+     service: name=nfs state=started enabled=true
+   - name: make share directory
+     file:
+       path: /share
+       state: directory
+       group: nfsnobody
+       owner: nfsnobody
+       mode: '0755'
+   - name: configuring nfs server
+     template:
+       src: /ansible/nfsfiles/exports.j2
+       dest: /etc/exports
+     notify: nfs server
+  handlers:
+   - name : nfs server
+     service: name=nfs state=restarted
+- hosts: nfsserver
+  become: true
+  tasks:
+   - name: exporting the share directory
+     shell: exportfs -av

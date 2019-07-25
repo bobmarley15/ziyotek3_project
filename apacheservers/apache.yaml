@@ -1,0 +1,22 @@
+---
+- hosts: apacheservers
+  become: true
+  gather_facts: true
+  tasks:
+   - name: install httpd for all web servers
+     yum:  name=httpd  state=present
+   - name: start httpd deamon in all  web servers
+     service: name=httpd state=started  enabled=yes
+   - name: configuring apache servers
+     template:
+       src: /ansible/apacheservers/index.j2
+       dest: /var/www/html/index.html
+       group: apache
+       owner: apache
+       mode: '0644'
+     notify: restart httpd
+  handlers:
+   - name: restart httpd
+     service: name=httpd state=restarted
+
+

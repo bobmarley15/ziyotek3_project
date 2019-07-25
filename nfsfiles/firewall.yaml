@@ -1,0 +1,11 @@
+---
+- hosts: nfsserver
+  become: true
+  tasks:
+   - name: start firewalld
+     shell: systemctl start firewalld
+   - name: firewall rules
+     shell: firewall-cmd --permanent --add-service={mountd,rpc-bind,nfs}
+   - name: reload firewalld
+     shell: firewall-cmd --reload
+

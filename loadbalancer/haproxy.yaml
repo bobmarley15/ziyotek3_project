@@ -1,0 +1,18 @@
+---
+- hosts: loadbalancer
+  become: true
+  tasks:
+   - name: install haproxy
+     yum: name=haproxy state=latest
+   - name:  configuring haproxy
+     copy:
+       src: /ansible/loadbalancer/haproxy.cfg
+       dest: /etc/haproxy/haproxy.cfg
+       group: root
+       owner: root
+       mode: '0644'
+     notify: restart haproxy
+  handlers:
+    - name: restart haproxy
+      service: name=haproxy state=restarted
+

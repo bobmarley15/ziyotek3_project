@@ -1,0 +1,23 @@
+---
+- hosts: ftpserver
+  become: true
+  tasks:
+   - name : install ftp packages
+     package: name=vsftpd state=latest
+   - name : start vsftpd
+     service: name=vsftpd state=started enabled=yes
+   - name: create user ftpuser
+     shell: useradd ftpuser -p `openssl passwd password`
+   - name: configuring ftp server
+     copy:
+       src: /ansible/ftpfiles/vsftpd.j2
+       dest: /etc/vsftpd/vsftpd.conf
+       group: root
+       owner: root
+       mode: '0600'
+     become: true
+     notify: restart vsftpd
+  handlers:
+   - name:   restart vsftpd
+     service: name=vsftpd state=restarted
+

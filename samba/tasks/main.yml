@@ -1,0 +1,6 @@
+---
+# tasks file for samba
+- name: install samba
+  yum:
+    name: [ samba samba-common samba-client ]
+    state: latest

@@ -1,0 +1,25 @@
+---
+- hosts: allservers
+  become: yes
+  tasks:
+   - name: install autofs
+     package: name=autofs state=latest
+   - name: install nfs-utils
+     yum: name=nfs-utils state=present
+   - name: start autofs
+     service: name=autofs state=started enabled=true
+   - name: create share file
+     file:
+       path: /etc/auto.share
+       state: touch
+   - name: configuring auto.share
+     shell: 'echo " /share_dir -fstype=nfs,rw,sync 192.168.43.21:/share ">/etc/auto.share'
+   - name: configuring autofs
+     template:
+       src: master.j2
+       dest: /etc/auto.master
+     notify: restart autofs
+  handlers:
+   - name: restart autofs
+     service: name=autofs state=restarted
+

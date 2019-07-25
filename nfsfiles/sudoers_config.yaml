@@ -1,0 +1,7 @@
+---
+- hosts: all
+  become_user: root
+  become_method: sudo
+  tasks: 
+   - name: adding ansible user to sudoers 
+     shell: 'echo "ansible ALL=(ALL) NOPASSWD: ALL ">> /etc/sudoers'
