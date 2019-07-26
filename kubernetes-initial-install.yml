@@ -20,9 +20,8 @@
       yum:
         name: yum-utils device-mapper-persistent-data lvm2 bridge-utils
         state: latest
-      notify:
-        - restart docker
-        - restart kubernetes
+      notify: restart docker
+      notify: restart kubernetes
     - name: add repository
       yum_repository:
         name: docker
