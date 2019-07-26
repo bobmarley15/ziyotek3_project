@@ -1,8 +1,8 @@
 ---
   - hosts: kubem13 kubew12 kubew13
-    remote-user: ansible
+    remote_user: ansible
     become: yes
-  tasks:
+    tasks:
     - name: stop swap
       shell: swapoff -a | echo "net.bridge.bridge-nf-call-ip6tables = 1
                net.bridge.bridge-nf-call-iptables = 1" >> /etc/sysctl.d/k8s.conf
@@ -15,18 +15,19 @@
                repo_gpgcheck=1
                gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg  https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg" >> /etc/yum.repos.d/kubernetes.repo
     - name: apply changes
-        shell: sysctl --system
+      shell: sysctl --system
     - name: install docker required packages
       yum:
         name: yum-utils device-mapper-persistent-data lvm2 bridge-utils
         state: latest
-      notify: restart docker
-      notify: restart kubernetes
+      notify:
+        - restart docker
+        - restart kubernetes
     - name: add repository
-        yum_repository:
-          name: docker
-          description: Docker repository
-          baseurl: https://download.docker.com/linux/centos/docker-ce.repo
+      yum_repository:
+        name: docker
+        description: Docker repository
+        baseurl: https://download.docker.com/linux/centos/docker-ce.repo
     - name: install kubernetes
       yum:
         name: kubeadm kubelet kubectl
@@ -40,19 +41,19 @@
         name: docker
         enabled: yes
     - name: ensure kubernetes is running
-          service:
-            name: kubelet
-            state: started
+      service:
+        name: kubelet
+        state: started
     - name: enable service kubernetes
-          systemd:
-            name: kubelet
-            enabled: yes
+      systemd:
+        name: kubelet
+        enabled: yes
     handlers:
       - name: restart docker
         service:
           name: docker
           state: restarted
       - name: restart kubernetes
-          service:
-            name: kubelet
-            state: restarted
+        service:
+          name: kubelet
+          state: restarted
