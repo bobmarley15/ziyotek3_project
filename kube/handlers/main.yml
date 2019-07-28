@@ -1,2 +1,12 @@
 ---
 # handlers file for kube
+- name: restart docker
+  service:
+    name: docker
+    state: restarted
+    enabled: true
+- name: restart kubernetes
+  service:
+    name: kubelet
+    state: restarted
+    enabled: true 

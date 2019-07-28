@@ -1,2 +1,84 @@
 ---
 # tasks file for kube
+- name: swapoff
+  shell: swapoff -a
+- lineinfile:
+    path: /etc/fstab
+    regexp: '/dev/mapper/centos-swap*'
+    line: '#/dev/mapper/centos-swap'
+
+- name: Set SELinux in permissive mode until the machine is rebooted
+  command: setenforce 0
+  ignore_errors: true
+  changed_when: false
+- name: Disable SELinux at next reboot
+  selinux:
+    state: disabled
+- name: start firewalld
+  service:
+    name: firewalld
+    state: started
+    enabled: true
+- name: add ports to firewalld
+  firewalld:
+    port: 6443/tcp
+    permanent: true
+    state: enabled
+- name: add ports to firewalld
+  firewalld:
+    port: 2379-2380/tcp
+    permanent: true
+    state: enabled
+- name: add ports to firewalld
+  firewalld:
+    port: 10250-10252/tcp
+    permanent: true
+    state: enabled
+- name: add ports to firewalld
+  firewalld:
+    port: 10255/tcp
+    permanent: true
+    state: enabled
+- name: reload firewalld
+  command: firewall-cmd --reload
+
+- name: template sysctl file
+  template:
+    src: k8s.conf.j2
+    dest: /etc/sysctl.d/k8s.conf
+- name: template kube repo
+  template:
+    src: kubernetes.repo.j2
+    dest: /etc/yum.repos.d/kubernetes.repo
+- name: apply changes
+  shell: sysctl --system
+- name: extend yum timeout
+  shell: echo 'timeout=120' >> /etc/yum.conf
+- name: install docker required packages
+  yum:
+    name: [yum-utils,device-mapper-persistent-data,lvm2,bridge-utils]
+    state: latest
+- name: add docker repo
+  shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+- name: export docker
+  shell: export VERSION=18.06 && curl -sSL get.docker.com | sh
+- name: install kubernetes required packages
+  yum:
+    name: [kubeadm,kubelet,kubectl]
+    state: latest
+- name: start docker and kubernetes
+  service: [docker,kubelet]
+    state: started
+    enabled: true
+- name: initalize kubernetes
+  shell: kube init
+- name: make kube directory
+  shell: mkdir -p $HOME/.kube
+- name: cop kube config files
+  shell: cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+- name: export docker
+  shell: cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+- name: export docker
+  shell: cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+- name: export docker
+  shell: cp -i /etc/kubernetes/admin.conf $HOME/.kube/config

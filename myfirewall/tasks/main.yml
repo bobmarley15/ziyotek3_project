@@ -11,10 +11,4 @@
     state: started
     enabled: true
 
-- name: firewall services config
-  firewalld:
-    state: enabled
-    immediate: true
-    permanent: true
-    service: "{{ firewall_service }}"
-     
+-

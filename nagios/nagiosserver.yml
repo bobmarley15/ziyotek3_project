@@ -1,0 +1,133 @@
+---
+- hosts: nagios
+  become: yes
+
+  tasks:
+  - name: install these packages
+    shell: yum install -y gcc glibc-common gd gd-devel make net-snmp openssl-devel http php unzip
+
+
+  - name: start http and enable
+    service: name=httpd state=started enabled=yes
+
+  - name: add group nagcmd
+    group:
+      name: nagcmd
+
+  - name: add the user nagios
+    user:
+      name: nagios
+      password: $1$LY1nvQG9$0AT9KOD7aHA1Bxf4wqp2m/
+      state: present
+
+  - name: add apache user to nagcmd group
+    user:
+      name: apache
+      group: nagcmd
+      append: yes
+
+  - name: add nagios user to nagcmd group
+    user:
+      name: nagios
+      group: nagcmd
+      append: yes
+
+
+  - name: dowwnload nagios
+    shell: curl -L -O https://assets.nagios.com/downloads/nagioscore/releases/nagios-4.4.3.tar.gz
+ 
+
+  - name: extract the nagios archive
+    shell: tar xvf nagios-*.tar.gz
+
+  - name: change into the dir and execute this command
+    command: ./configure --with-command-group=nagcmd
+    args:
+      chdir: /home/ansible/nagios-4.4.3
+  - name: run the make all command
+    shell: make all
+    args:
+      chdir: /home/ansible/nagios-4.4.3
+
+  - name: run make install
+    shell: make install
+    args:
+      chdir: /home/ansible/nagios-4.4.3
+
+  - name: run make install commandmode
+    shell: make install-commandmode
+    args:
+      chdir: /home/ansible/nagios-4.4.3
+
+  - name: run make install-init
+    shell: make install-init
+    args:
+      chdir: /home/ansible/nagios-4.4.3
+
+  - name: run make install-config
+    shell: make install-config
+    args:
+      chdir: /home/ansible/nagios-4.4.3
+
+  - name: run install-webconf
+    shell: make install-webconf
+    args:
+      chdir: /home/ansible/nagios-4.4.3
+
+  - name: download nagios-plugin
+    shell: curl -L -O http://nagios-plugins.org/download/nagios-plugins-2.2.1.tar.gz
+    args:
+      chdir: ~
+
+
+  - name: extract plugin
+    shell: tar xvf nagios-plugins-*.tar.gz
+
+
+  - name: change into nagios plugin and run commands
+    command: ./configure --with-nagios-user=nagios --with-nagios-group=nagios --with-openssl
+    args:
+      chdir: /home/ansible/nagios-plugins-2.2.1
+
+  - name: run make
+    command: make
+    args:
+      chdir: /home/ansible/nagios-plugins-2.2.1
+  - name: run make all
+    command: make all
+    args:
+      chdir: /home/ansible/nagios-plugins-2.2.1
+  - name: change dir
+    shell: cd ~
+
+  - name: comment out a line in this file
+    template:
+      src: /ansible/nagios/servers.j2
+      dest: /usr/local/nagios/etc/nagios.cfg
+
+  - name: make directory
+    file:
+      path: /usr/local/nagios/etc/servers
+      state: directory
+
+  - name: configure email address in contacts.cfg
+    template:
+      src: /ansible/nagios/contacts.j2
+      dest: /usr/local/nagios/etc/objects/contacts.cfg
+
+  - name: restart httpd
+    service:
+      name: httpd
+      state: restarted
+      enabled: yes
+
+  - name: config check
+    shell: /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
+
+  - name: start nagios
+    service:
+      name: nagios
+      state: started
+      enabled: yes
+
+

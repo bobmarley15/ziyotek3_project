@@ -1,0 +1,10 @@
+---
+- hosts: nagios
+  become: yes
+
+  tasks:
+  - name: add to firewall
+    shell: firewall-cmd --permanent --add-service=http
+  - name:
+    shell: firewall-cmd --reload
+
