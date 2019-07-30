@@ -1,0 +1,21 @@
+---
+
+- hosts: database
+  become: yes
+
+  tasks:
+  - name: add MariaDB yum repo
+    template:
+      src: /ansible/databases/templates/MariaDB.j2
+      dest: /etc/yum.repos.d/MariaDB.repo
+
+  - name: install MariaDB server and client
+    yum:
+      name: MariaDB-server, MariaDB-client
+
+  - name: start and enable MariaDB
+    service:
+      name: mariadb
+      enabled: yes
+      state: started
+

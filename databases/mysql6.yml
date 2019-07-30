@@ -1,0 +1,16 @@
+---
+
+- hosts: database
+  become: yes
+
+  tasks:
+
+  - name: install mysql 
+    shell: yum install -y  mysql-server mysql
+  
+  - name: start and enable mysqld
+    service:
+      name: mysqld
+      enabled: yes
+      state: started
+

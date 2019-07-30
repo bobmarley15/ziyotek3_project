@@ -1,0 +1,38 @@
+
+---
+
+- hosts: database
+  become: yes
+
+  tasks:
+  - name: install httpd
+    yum:
+      name: httpd
+      state: latest
+
+  - name: start and enable httpd
+    service:
+      name: httpd
+      enabled: yes
+      state: started
+
+  - name: add http to iptables
+    shell: iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+  - name: save
+    shell: service iptables save
+
+  - name: install myadmin php
+    yum:
+      name: [ 'epel-release', 'php' ]
+
+  - name: configure the myadmin config
+    template:
+      src: /ansible/databases/templates/phpmyadmin6.j2
+      dest: /etc/httpd/conf.d/phpMyAdmin.conf
+
+  - name: restart htppd
+    service:
+      name: httpd
+      state: restarted
+
+
