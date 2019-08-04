@@ -75,6 +75,10 @@
   template:
     src: 10-master.conf.j2
     dest: /etc/dovecot/conf.d/10-master.conf
+- name: template LDAP authorization
+  template:
+    src: dovecot.j2
+    dest: /etc/pam.d/dovecot
 
 - name: start and enable dovecot
   service:
