@@ -1,1 +1,0 @@
-# ziyotek3_project
