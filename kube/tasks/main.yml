@@ -74,10 +74,10 @@
   shell: kube init
 - name: make kube directory
   shell: mkdir -p $HOME/.kube
-- name: cop kube config files
+- name: copy kube config files
   shell: cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-- name: export docker
-  shell: cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+- name: chown kube config
+  shell: chown $(id -u):$(id -g) $HOME/.kube/config
 - name: export docker
   shell: cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 - name: export docker
