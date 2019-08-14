@@ -1,0 +1,48 @@
+---
+  - name: Configure  LDAP server for login using GUI
+    remote_user: ansible
+    become: yes
+    hosts: ldap
+
+    tasks:
+    - name: Disable SELinux permanently
+      lineinfile: dest=/etc/sysconfig/selinux regexp="SELINUX=" line="SELINUX=disabled"
+
+    - name: turn off firewall for install
+      service:
+        name: firewalld
+        state: stopped
+        enabled: false
+
+    - name: Installing epel-release
+      yum:
+        name: epel-release
+        state: latest
+
+    - name: Installing packages
+      yum:
+        name: ['phpldapadmin', 'httpd']
+        state: latest
+
+    - name: configure ldap
+      template:
+        src: ./tmplates/tst_config.php
+        dest: /etc/phpldapadmin/config.php
+
+    - name: edit permission
+      template:
+        src: ./tmplates/tst_phpldapadmin.conf
+        dest: /etc/httpd/conf.d/phpldapadmin.conf
+      notify: restart httpd
+
+    - name: start httpd
+      service:
+        name: httpd
+        state: started
+        enabled: true
+
+    handlers:
+      - name: restart httpd
+        service:
+          name: httpd
+          state: restarted

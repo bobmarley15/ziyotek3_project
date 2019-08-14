@@ -1,0 +1,35 @@
+---
+- hosts: all, !samba
+  remote_user: ansible
+  become: yes
+
+  tasks:
+  - name: Installing packages.
+    yum:
+      name: ['samba-common', 'samba-client', 'cifs-utils', 'libselinux-python', 'policycoreutils-python']
+      state: latest
+
+  - name: create a directory to share
+    file: path=/sambaclient
+          mode=0777
+          state=directory
+
+  - name: Allow samba to modify files in /sambaclient
+    sefcontext:
+      target: '/sambaclient(/.*)?'
+      setype: samba_share_t
+      state: present
+
+  - name: Apply new SELinux file context to filesystem
+    command: restorecon -iRv /sambaclient
+
+  - name: create mount
+    lineinfile: dest=/etc/fstab
+                insertafter=EOF
+                line="//prdx-samba13/sambashare        /sambaclient/   cifs   user=smbadmin,password=password  0 0"
+
+  - name: Mount /sambaclient
+    shell: |
+      mount -a
+    become: true
+

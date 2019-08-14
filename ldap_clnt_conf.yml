@@ -1,0 +1,47 @@
+---
+- name: Configure  LDAP server for login using cli
+  hosts: all, !ldap
+  remote_user: ansible
+  become: yes
+
+  tasks:
+  - name: Disable SELinux
+    shell: setenforce 0
+    ignore_errors: yes
+
+  - name: Disable SELinux permanently
+    lineinfile: dest=/etc/sysconfig/selinux regexp="SELINUX=" line="SELINUX=disabled"
+
+  - name: turn off firewall for install
+    service:
+      name: firewalld
+      state: stopped
+      enabled: false
+
+  - name: Installing packages
+    yum:
+      name: ['openldap-clients', 'nss-pam-ldapd']
+      state: latest
+
+  - name: Adding Client to the LDAP Server
+    shell: authconfig --enableldap --enableldapauth --ldapserver=192.168.43.34 --ldapbasedn="dc=ziyotek3,dc=local" --enablemkhomedir --update
+#     shell: authconfig --enableldap --enableldapauth --ldapserver=ldap://192.168.43.34 --ldapbasedn="dc=ziyotek3,dc=local" --enablemkhomedir --disableldaptls --update
+
+  - name: restart nslcd
+    service:
+       name: nslcd
+       state: restarted
+       enabled: true
+
+  - name: Change Configuration File
+    lineinfile:
+      path: /etc/nslcd.conf
+      insertafter: EOF
+      line: 'tls_reqcert allow'
+#    nofify: restart nslcd
+
+#  handlers:
+  - name: restart nslcd
+    service:
+      name: nslcd
+      state: restarted

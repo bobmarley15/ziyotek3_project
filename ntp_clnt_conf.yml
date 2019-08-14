@@ -1,0 +1,43 @@
+---
+- name: install ntp on all boxes
+  hosts: all, !ntp
+  remote_user: ansible
+  become: yes
+
+  tasks:
+  - name: install ntp packages
+    yum:
+      name: ntp
+      state: latest
+
+  - name: configure ntp
+    template:
+      src: ./tmplates/ntp.conf.j2
+      dest: /etc/ntp.conf
+    notify: restart ntp
+
+  - name: start ntpd
+    service:
+      name: ntpd
+      state: started
+      enabled: true
+
+  - name: firewall services config for ntp
+    firewalld:
+      state: enabled
+      immediate: true
+      permanent: true
+      zone: public
+      service: ntp
+    notify: restart firewall
+
+  handlers:
+    - name: restart ntp
+      service:
+        name: ntpd
+        state: restarted
+
+    - name: restart firewall
+      service:
+        name: firewalld
+        state: restarted

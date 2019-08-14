@@ -1,0 +1,13 @@
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcSuffix
+olcSuffix: dc=ziyotek3,dc=local
+
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcRootDN
+olcRootDN: cn=admin,dc=ziyotek3,dc=local
+
+dn: olcDatabase={2}hdb,cn=config
+changetype: modify
+replace: olcRootPW

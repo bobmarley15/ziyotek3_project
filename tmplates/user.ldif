@@ -1,0 +1,16 @@
+dn: uid=TomW,ou=users,dc=ziyotek3,dc=local
+objectClass: top
+objectClass: account
+objectClass: posixAccount
+objectClass: shadowAccount
+cn: TomW
+uid: TomW
+uidNumber: 1000
+gidNumber: 1000
+homeDirectory: /home/TomW
+loginShell: /bin/bash
+gecos: TomW,System Engineer
+userPassword: {crypt}x
+shadowLastChange: 0
+shadowMax: 0
+shadowWarning: 0
