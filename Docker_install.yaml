@@ -1,6 +1,6 @@
 ---
 - hosts: docker13
-  remote-user: ansible
+  remote_user: ansible
   become: yes
   tasks:
     - name: install required packages
