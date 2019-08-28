@@ -1,31 +1,29 @@
+
 ---
-- hosts: docker13
-  remote-user: ansible
+- hosts: docker
+  remote_user: ansible
   become: yes
   tasks:
-    - name: install required packages
-      yum:
-        name: yum-utils device-mapper-persistent-data lvm2
-        state: latest
-    - name: add repository
-      yum_repository:
-        name: docker
-        description: Docker repository
-        baseurl: https://download.docker.com/linux/centos/docker-ce.repo
-    - name: install docker
-      yum:
-        name: docker-ce bridge-utils
-        state: latest
-      notify: restart docker
-    - name: ensure docker is running
-      service:
-        name: docker
-        state: started
-    - name: enable service docker
-        systemd:
-          name: docker
-          enabled: yes
-    handlers:
+  - name: install required packages
+    yum:
+      name: yum-utils, device-mapper-persistent-data, lvm2
+      state: latest
+  - name: add repository
+    shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  - name: install docker
+    yum:
+      name: docker-ce, bridge-utils
+      state: latest
+    notify: restart docker
+  - name: ensure docker is running
+    service:
+      name: docker
+      state: started
+  - name: enable service docker
+    systemd:
+      name: docker
+      enabled: yes
+  handlers:
       - name: restart docker
         service:
           name: docker
