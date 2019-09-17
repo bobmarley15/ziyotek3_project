@@ -35,7 +35,7 @@
 
   - name: dowwnload nagios
     shell: curl -L -O https://assets.nagios.com/downloads/nagioscore/releases/nagios-4.4.3.tar.gz
- 
+
 
   - name: extract the nagios archive
     shell: tar xvf nagios-*.tar.gz
@@ -54,7 +54,7 @@
     args:
       chdir: /home/ansible/nagios-4.4.3
 
-  - name: run make install commandmode
+      - name: run make install commandmode
     shell: make install-commandmode
     args:
       chdir: /home/ansible/nagios-4.4.3
@@ -129,5 +129,3 @@
       name: nagios
       state: started
       enabled: yes
-
-

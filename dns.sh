@@ -1,5 +1,5 @@
 #!/bin/sh
-declare -i COUNT
+declare -i COUNT           #gaurantees that it holds integer value, permits arithmic evaluation
 FILE="/var/named/tom.flz"
 FILEPTR="/var/named/tom.rlz"
 COUNT=1
@@ -11,6 +11,4 @@ do
         echo -e "$COUNT\tIN\tPTR\tdnsworker.tom.local.$COUNT" >> $FILEPTR
 COUNT=$COUNT+1
 done
-less $FILE
-less $FILEPTR
 systemctl restart named
