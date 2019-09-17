@@ -1,0 +1,11 @@
+import os
+os.mkdir('/tmp/testdir')
+os.chdir('/tmp/testdir')
+os.mknod('file.txt')
+os.listdir('.')
+os.system( 'chmod 777 file.txt')
+os.chown('/tmp/testdir/file.txt', 1000, 1000)
+os.system('ls -l')
+os.remove('file.txt')
+os.rmdir('/tmp/testdir')
+os.system('ls -l')
