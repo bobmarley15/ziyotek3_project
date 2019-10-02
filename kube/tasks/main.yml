@@ -2,7 +2,7 @@
 # tasks file for kube
 - name: swapoff
   shell: swapoff -a
-- lineinfile:
+- lineinfile: disable swap persistent to boot 
     path: /etc/fstab
     regexp: '/dev/mapper/centos-swap*'
     line: '#/dev/mapper/centos-swap'

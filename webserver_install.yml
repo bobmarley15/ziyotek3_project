@@ -10,7 +10,7 @@
   - name: create apache config file
     template:
      src: /srv/httpd.j2
-     dest: /etc/htrpd/conf/httpd.conf
+     dest: /etc/httpd/conf/httpd.conf
   - name: create index file
     template:
       src: /srv/index.j2

@@ -8,7 +8,10 @@
 
 
   - name: start http and enable
-    service: name=httpd state=started enabled=yes
+    service:
+      name: httpd
+      state: started
+      enabled: yes
 
   - name: add group nagcmd
     group:
@@ -33,9 +36,8 @@
       append: yes
 
 
-  - name: dowwnload nagios
+  - name: download nagios
     shell: curl -L -O https://assets.nagios.com/downloads/nagioscore/releases/nagios-4.4.3.tar.gz
-
 
   - name: extract the nagios archive
     shell: tar xvf nagios-*.tar.gz
