@@ -1,14 +1,73 @@
 ---
 # tasks file for samba
-  vars_prompt:
-    - name: smb_usrname
-      prompt: "Enter samba share username"
+vars_prompt:      #sensitive data you don't want to record
+  - name: smb_usrname
+    prompt: "Enter samba share username"
 
-    - name: smb_passwd
-      prompt: "Enter samba share password"
-      private: yes
+  - name: smb_passwd
+    prompt: "Enter samba share password"
+    private: yes
 
 - name: install samba
   yum:
-    name: [ samba samba-common samba-client ]
+    name: [ samba,samba-common,samba-client,libselinux-python,policycoreutils-python  ] #last two packages for sefcontext module
     state: latest
+
+- name: create a directory to share
+  file: path=/sambashare
+          mode=0777
+          state=directory
+
+- name: configure samba
+    template:
+      src: smb.conf.j2
+      dest: /etc/samba/smb.conf
+
+- name: Allow samba to modify files in /sambashare
+    sefcontext:
+      target: '/sambashare(/.*)?'
+      setype: samba_share_t
+      state: present
+
+- name: Apply new SELinux file context to filesystem
+  command: restorecon -iRv /sambashare
+
+- name: Create samba access group
+  group:
+    name: smbgrp
+    state: present
+
+- name: Add the Samba user
+  user:
+   name: "{{smb_usrname}}"
+   groups: smbgrp
+ create_home: no
+   append: yes
+
+- name: Add Password
+  shell: "(echo {{ smb_passwd }}; echo {{ smb_passwd }}) | smbpasswd -s -a {{smb_usrname}}"
+
+- name: configure firewall, allow samba traffic
+  firewalld: service=samba
+             permanent=true
+             state=enabled
+
+- name: configure firewall, allow samba-client traffic
+  firewalld: service=samba-client
+             permanent=true
+             state=enabled
+
+- name: start samba
+  service: name=smb
+           state=restarted
+           enabled=yes
+
+- name: start named
+  service: name=nmb
+           state=restarted
+           enabled=yes
+
+- name: restart firewall
+  service:
+    name: firewalld
+    state: restarted
