@@ -1,0 +1,6 @@
+---
+# handlers file for mail
+- name: restart named
+  service:
+    name: named
+    state: restarted

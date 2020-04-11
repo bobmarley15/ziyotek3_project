@@ -1,0 +1,22 @@
+---
+# tasks file for mail
+- name: install dns
+  yum:
+    name: ['bind', 'bind-utils']
+    state: latest
+
+- name: template config file
+  template:
+    src: named.conf.j2
+    dest: /etc/named.conf
+
+- name: template config file
+  template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+
+- name: start named
+  service:
+    name: named
+    state: started
+    enabled: true
