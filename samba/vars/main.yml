@@ -1,2 +1,9 @@
 ---
 # vars file for samba
+vars_prompt:      #sensitive data you don't want to record
+  - name: smb_usrname
+    prompt: "Enter samba share username"
+
+  - name: smb_passwd
+    prompt: "Enter samba share password"
+    private: yes

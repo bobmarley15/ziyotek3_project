@@ -1,17 +1,17 @@
 
 ---
-- hosts: docker
+- hosts: prometheus
   remote_user: ansible
   become: yes
   tasks:
-  - name: extend yum timeout
-    shell: echo 'timeout=120' >> /etc/yum.conf
+  - name: add user prometheus
+    shell: useradd -m -s /bin/bash -p `openssl passwd password` prometheus
+  - name: switch to prometheus
+    shell: su - prometheus
   - name: install required packages
-    yum:
-      name: yum-utils, device-mapper-persistent-data, lvm2
-      state: latest
-  - name: add repository
-    shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+    shell: wget https://github.com/prometheus/prometheus/releases/download/v2.2.1/prometheus-2.2.1.linux-amd64.tar.gz
+- name: extract file
+  shell: tar xvfz prometheus-2.2.1.linux-amd64.tar.gz
   - name: install docker
     yum:
       name: docker-ce, bridge-utils
